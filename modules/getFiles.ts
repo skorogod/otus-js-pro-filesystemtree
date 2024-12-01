@@ -1,9 +1,11 @@
 import * as fs from "fs/promises";
 import * as path from "path";
+import { Folder } from "./types";
 
-export async function getFiles(filename, dir, currentDepth, depth) {
-  let files = {};
-  let promiseArr;
+
+export async function getFiles(filename: string, dir: string, currentDepth: number, depth: number): Promise<Folder> {
+  let files: Folder[] = [];
+  let promiseArr: ReturnType<typeof getFiles>[] = [];
 
   const dirents = await fs.readdir(dir, { withFileTypes: true });
 
@@ -12,7 +14,7 @@ export async function getFiles(filename, dir, currentDepth, depth) {
       const res = path.resolve(dir, dirent.name);
       return dirent.isDirectory()
         ? getFiles(dirent.name, res, currentDepth + 1, depth)
-        : { name: dirent.name };
+        : new Promise((res) => res({ name: dirent.name, items: []}));
     });
   } else {
     promiseArr = [];
